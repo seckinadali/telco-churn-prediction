@@ -42,16 +42,16 @@ telco-churn-prediction/
 ## Model Development
 The project is implementing several models optimized for different business objectives:
 - Logistic Regression (optimized for F1-score)
-- Gradient Boosting (optimized for precision)
+- Random Forest (optimized for precision)
 - Linear SVM (optimized for recall)
 
 Class imbalance is being addressed using balanced class weights.
 
 ## Current Results
 Preliminary model performance (subject to further optimization):
-- A balanced model for general churn prediction (F1-score: ~0.69)
-- A precision-focused model for targeted interventions (Precision: ~0.74)
-- A recall-focused model to minimize missed potential churners (Recall: ~0.85)
+- A balanced model for general churn prediction (F1-score: ~0.68)
+- A precision-focused model for targeted interventions (Precision: ~0.86)
+- A recall-focused model to minimize missed potential churners (Recall: ~0.86)
 
 ## Future Work
 - Complete feature importance analysis
