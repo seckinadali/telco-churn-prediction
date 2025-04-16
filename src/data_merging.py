@@ -76,16 +76,16 @@ def load_datasets():
 
 def check_primary_keys(datasets):
     """Check if customer_id can be used as primary key for merging datasets"""
-    logger.info("Checking primary keys...")
+    logger.info("\nChecking primary keys...")
     
     primary_datasets = ['demographics', 'location', 'services', 'status']
     
     s = set(datasets[primary_datasets[0]]['customer_id'])
-    logger.info(f"Number of unique customer ids in {primary_datasets[0]}: {len(s)}")
+    logger.debug(f"Number of unique customer ids in {primary_datasets[0]}: {len(s)}")
     
     for name in primary_datasets[1:]:
         if s == set(datasets[name]['customer_id']):
-            logger.info(f"{name} has the same customer ids")
+            logger.debug(f"{name} has the same customer ids")
         else:
             logger.warning(f"Warning! {name} does not have the same customer id set")
             return False
@@ -103,9 +103,9 @@ def merge_without_duplicates(df1, df2, df2_name):
     df2 = df2.copy().drop(cols_to_drop, axis=1)
     df1 = df1.merge(df2, on='customer_id', how='outer')
 
-    logger.info(f"Merging with {df2_name}")
-    logger.info(f"Columns dropped when merging: {cols_to_drop}")
-    logger.info(f"Resulting shape: {df1.shape}")
+    logger.debug(f"Merging with {df2_name}")
+    logger.debug(f"Columns dropped when merging: {cols_to_drop}")
+    logger.debug(f"Resulting shape: {df1.shape}")
 
     return df1
 
@@ -122,7 +122,7 @@ def merge_datasets(datasets):
     
     # Merge primary datasets
     merged_df = datasets[primary_datasets[0]].copy()
-    logger.info(f"Starting with {primary_datasets[0]}")
+    logger.debug(f"Starting with {primary_datasets[0]}")
     
     for name in primary_datasets[1:]:
         merged_df = merge_without_duplicates(merged_df, datasets[name], name)
@@ -140,7 +140,7 @@ def merge_datasets(datasets):
 
 def compare_with_combined_datasets(merged_df, datasets):
     """Compare the merged dataset with the two pre-consolidated datasets"""
-    logger.info("Comparing with pre-consolidated datasets...")
+    logger.info("\nComparing with pre-consolidated datasets...")
     
     merged_df_cols = set(merged_df.columns)
     churn1_cols = set(datasets['churn1'].columns)
@@ -177,13 +177,13 @@ def run_data_merging():
             logger.warning(f"Warning: {merged_df.duplicated().sum()} duplicated rows found in the merged dataset!")
             return False
         else:
-            logger.info("No duplicated rows found in the merged dataset.")
+            logger.debug("No duplicated rows found in the merged dataset.")
         
         # Compare with combined datasets
         comparison = compare_with_combined_datasets(merged_df, datasets)
-        logger.info(f"Columns in churn1 but not in merged_df: {comparison['in_churn1_not_in_merged']}")
-        logger.info(f"Columns in churn2 but not in merged_df: {comparison['in_churn2_not_in_merged']}")
-        logger.info(f"Columns in merged_df but not in the other two: {comparison['in_merged_not_in_others']}")
+        logger.debug(f"Columns in churn1 but not in merged_df: {comparison['in_churn1_not_in_merged']}")
+        logger.debug(f"Columns in churn2 but not in merged_df: {comparison['in_churn2_not_in_merged']}")
+        logger.debug(f"Columns in merged_df but not in the other two: {comparison['in_merged_not_in_others']}")
         
         # Save merged dataset
         output_path = PROCESSED_DATA_DIR / 'telco_merged.csv'
