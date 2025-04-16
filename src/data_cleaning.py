@@ -11,6 +11,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Suppress matplotlib categorical warnings that occur when plotting numerical data 
+# as categories. These warnings are informational only and don't indicate actual 
+# problems with the visualization output.
+logging.getLogger('matplotlib.category').setLevel(logging.WARNING)
+
 # Logger configuration
 import logger
 
@@ -157,22 +162,19 @@ def encode_binary_features(df):
 # === Example of object-oriented figure handling ===
 def plot_correlation_matrix(df, figsize=(20, 20)):
     """Plot correlation matrix for numerical features"""
+    logger.info("\nPlotting correlations...")
     fig, ax = plt.subplots(figsize=figsize)
     correlation = df.corr(numeric_only=True)
     mask = np.triu(np.ones_like(correlation, dtype=bool))
     sns.heatmap(correlation, mask=mask, annot=True, fmt='.2f', cmap='coolwarm', ax=ax)
     ax.set_title('Correlation Matrix of Numerical Features')
     plt.tight_layout()
-    return fig
+    fig.savefig(FIGURES_DIR / 'correlation_matrix.png')
+    plt.close(fig)
 
 def analyze_correlations(df):
     """Analyze correlations and handle highly correlated features"""
     logger.info("\nAnalyzing correlations...")
-    
-    # Plot correlation matrix
-    fig = plot_correlation_matrix(df)
-    fig.savefig(FIGURES_DIR / 'correlation_matrix.png')
-    plt.close(fig)
     
     # Drop 'total_charges' as it's strongly correlated with 'total_revenue'
     df = df.drop(['total_charges'], axis=1)
@@ -279,13 +281,14 @@ def plot_feature_distributions(df, target_col='churn_value', cat_cutoff=10):
 
         # Percentage of target within each value of col
         churn_by_cat = df.groupby(col)[target_col].mean() * 100
-        sns.barplot(x=churn_by_cat.index, y=churn_by_cat.values, ax=axes[i, 2], 
-                    hue=churn_by_cat.index, legend=False,
+        churn_by_cat = churn_by_cat.reset_index()
+        sns.barplot(data=churn_by_cat, x=col, y=target_col, ax=axes[i, 2], 
+                    hue=col, legend=False,
                     palette='Dark2', order=cat_order)
         axes[i, 2].set_title(f"{target_col} rate by {col}")
         axes[i, 2].set_xlabel('')
         axes[i, 2].set_ylabel('Percentage')
-        axes[i, 2].set_ylim(0, churn_by_cat.max() * 1.1)
+        axes[i, 2].set_ylim(0, churn_by_cat[target_col].max() * 1.1)
         
         for p in axes[i, 2].patches:
             axes[i, 2].annotate(f"{p.get_height():.1f}%",
@@ -296,6 +299,8 @@ def plot_feature_distributions(df, target_col='churn_value', cat_cutoff=10):
     plt.tight_layout()
     fig_cat.savefig(FIGURES_DIR / 'categorical_features.png', dpi=300, bbox_inches='tight')
     plt.close(fig_cat)
+
+    logger.info(f"Categorical features distribution plot added to {FIGURES_DIR}")
     
     # Get numerical features
     num_cols = card[card['nunique'] >= cat_cutoff].index.to_list()
@@ -320,7 +325,9 @@ def plot_feature_distributions(df, target_col='churn_value', cat_cutoff=10):
     fig_num.savefig(FIGURES_DIR / 'numerical_features.png', dpi=300, bbox_inches='tight')
     plt.close(fig_num)
 
-def run_data_cleaning():
+    logger.info(f"Numerical features distribution plot added to {FIGURES_DIR}")
+
+def run_data_cleaning(plot_check=False):
     """
     Main function to load, process and sace cleaned dataset.
     Returns True if successful, False otherwise.
@@ -342,6 +349,8 @@ def run_data_cleaning():
     df = encode_binary_features(df)
     
     # Analyze correlations and handle highly correlated features
+    if plot_check:
+        plot_correlation_matrix(df)
     df = analyze_correlations(df)
 
     # Check satisfaction_score for data leakage
@@ -351,7 +360,8 @@ def run_data_cleaning():
     df = transform_skewed_features(df)
     
     # Visualize features
-    plot_feature_distributions(df)
+    if plot_check:
+        plot_feature_distributions(df)
     
     # logger.info dataset info
     logger.info(f"\nFinal shape: {df.shape}")

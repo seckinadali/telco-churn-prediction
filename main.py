@@ -14,12 +14,16 @@ import sys
 import logging
 
 from src.data_merging import run_data_merging
+from src.data_cleaning import run_data_cleaning
 
 # Logger configuration
 import logger
 
 # Get a logger
 logger = logging.getLogger(__name__)
+
+# Global configuration
+PLOT_CHECK = True  # Set to True if you want to generate plots
 
 def main():
     """
@@ -33,6 +37,14 @@ def main():
     
     if not data_merging_success:
         logger.error("Data merging failed. Stopping the pipeline.")
+        return False
+    
+    # Step 2: Data Cleaning and EDA
+    logger.info("\n=== STEP 2: DATA CLEANING AND EDA ===")
+    data_cleaning_success = run_data_cleaning(plot_check=PLOT_CHECK)
+    
+    if not data_cleaning_success:
+        logger.error("Data cleaning failed. Stopping the pipeline.")
         return False
     
     # TODO: Remaining steps
