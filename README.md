@@ -14,6 +14,26 @@ This project develops a predictive model for customer churn in a telecommunicati
 - Model development with threshold tuning for different business objectives
 - Feature importance analysis with multiple techniques (XGBoost, SHAP, Linear SVC)
 
+## Development Approach
+
+This project follows a deliberate two-phase development methodology:
+
+### 1. Exploration & Analysis (Notebooks)
+The Jupyter notebooks contain all experimental work including:
+- Data exploration and visualization
+- Multiple model comparisons and class imbalance techniques
+- Hyperparameter tuning experiments
+- Detailed visualizations and rationale for decisions
+
+### 2. Production Implementation (Modular Code)
+The Python modules implement only the final, optimized approaches:
+- Focused on the best-performing models (XGBoost and Linear SVC)
+- Streamlined preprocessing with decisions already made
+- Efficient implementation without experimental components
+- Production-ready code with proper logging and error handling
+
+This separation creates a codebase that maintains both comprehensive documentation of the analysis process (notebooks) and clean, maintainable implementation code (modules).
+
 ## Data
 
 The project uses IBM's sample datasets for telecom customer churn, which include:
@@ -90,8 +110,6 @@ telco-churn-prediction/
 │   ├── data_merging.py
 │   ├── data_cleaning.py
 │   ├── model_development.py
-│   ├── threshold_adjustment.py
-│   ├── test_evaluation.py
 │   ├── feature_importance.py
 │   └── __init__.py
 ├── main.py
@@ -112,7 +130,8 @@ Or run individual components:
 ```
 python src/data_merging.py
 python src/data_cleaning.py
-# etc.
+python src/model_development.py
+python src/feature_importance.py
 ```
 
 ### Notebooks
