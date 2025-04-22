@@ -2,7 +2,13 @@
 Data merging script for the telco churn prediction project.
 
 This script loads the raw Excel files, merges them, and saves
-the merged dataset as a CSV file.
+the merged dataset as a CSV file following the approach developed in the notebook '01_data_merging.ipynb'.
+
+The script follows these steps:
+1. Standardize column names across datasets
+2. Verify primary keys for joining datasets
+3. Merge related datasets while eliminating duplicate columns
+4. Compare merged result with pre-consolidated datasets for validation
 """
 
 import logging
@@ -76,7 +82,7 @@ def load_datasets():
 
 def check_primary_keys(datasets):
     """Check if customer_id can be used as primary key for merging datasets"""
-    logger.info("\nChecking primary keys...")
+    logger.info("Checking primary keys...")
     
     primary_datasets = ['demographics', 'location', 'services', 'status']
     
@@ -111,7 +117,7 @@ def merge_without_duplicates(df1, df2, df2_name):
 
 def merge_datasets(datasets):
     """Merge primary datasets and population dataset"""
-    logger.info("\nMerging datasets...")
+    logger.info("Merging datasets...")
     
     primary_datasets = ['demographics', 'location', 'services', 'status']
     
@@ -140,7 +146,7 @@ def merge_datasets(datasets):
 
 def compare_with_combined_datasets(merged_df, datasets):
     """Compare the merged dataset with the two pre-consolidated datasets"""
-    logger.info("\nComparing with pre-consolidated datasets...")
+    logger.info("Comparing with pre-consolidated datasets...")
     
     merged_df_cols = set(merged_df.columns)
     churn1_cols = set(datasets['churn1'].columns)
@@ -203,6 +209,6 @@ def main():
 if __name__ == "__main__":
     success = main()
     if not success:
-        logger.warning("\nData merging script completed with errors. Review output and check notebooks.")
+        logger.warning("Data merging script completed with errors. Review output and check notebooks.")
     else:
-        logger.info("\nData merging script completed successfully.")
+        logger.info("Data merging script completed successfully.")
