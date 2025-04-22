@@ -1,7 +1,15 @@
 """
 Data cleaning script for the telco churn prediction project.
 
-This script loads the merged dataset, performs exploratory data analysis and feature engineering, and saves the cleaned dataset ready for modeling.
+This script loads the merged dataset, performs exploratory data analysis and feature engineering, and saves the cleaned dataset ready for modeling following the approach developed in the notebook '02_data_cleaning_and_eda.ipynb'.
+
+The script follows these steps:
+1. Replace missing values in categorical features with meaningful values
+2. Remove redundant and duplicate features
+3. Encode binary variables for consistency
+4. Analyze correlations and address multicollinearity
+5. Transform skewed numerical features
+6. Check for and handle data leakage
 """
 
 from pathlib import Path
@@ -66,7 +74,7 @@ def missing_values(df):
 
 def handle_missing_values(df):
     """Handle missing values in the DataFrame"""
-    logger.info("\nHandling missing values...")
+    logger.info("Handling missing values...")
     
     # Check missing values
     missing_report = missing_values(df)
@@ -89,7 +97,7 @@ def handle_missing_values(df):
 
 def remove_redundant_features(df):
     """Remove redundant and unnecessary features"""
-    logger.info("\nRemoving redundant features...")
+    logger.info("Removing redundant features...")
     
     # Check and remove 'internet_service' as it's redundant with 'internet_type'
     internet_correspondence = ((df['internet_service'] == 'No') == (df['internet_type'] == 'no_internet')).all()
@@ -146,7 +154,7 @@ def cardinality(df, max_display=3):
 
 def encode_binary_features(df):
     """Encode binary categorical features to 0/1"""
-    logger.info("\nEncoding binary features...")
+    logger.info("Encoding binary features...")
     
     # Get binary features
     binary_features = cardinality(df)[cardinality(df)['nunique'] == 2].index.to_list()
@@ -162,7 +170,7 @@ def encode_binary_features(df):
 # === Example of object-oriented figure handling ===
 def plot_correlation_matrix(df, figsize=(20, 20)):
     """Plot correlation matrix for numerical features"""
-    logger.info("\nPlotting correlations...")
+    logger.info("Plotting correlations...")
     fig, ax = plt.subplots(figsize=figsize)
     correlation = df.corr(numeric_only=True)
     mask = np.triu(np.ones_like(correlation, dtype=bool))
@@ -174,7 +182,7 @@ def plot_correlation_matrix(df, figsize=(20, 20)):
 
 def analyze_correlations(df):
     """Analyze correlations and handle highly correlated features"""
-    logger.info("\nAnalyzing correlations...")
+    logger.info("Analyzing correlations...")
     
     # Drop 'total_charges' as it's strongly correlated with 'total_revenue'
     df = df.drop(['total_charges'], axis=1)
@@ -190,7 +198,7 @@ def analyze_correlations(df):
 
 def check_satisfaction_score(df):
     """Check if satisfaction_score has data leakage issues"""
-    logger.info("\nChecking satisfaction_score for data leakage...")
+    logger.info("Checking satisfaction_score for data leakage...")
     
     # Check if satisfaction score perfectly predicts churn
     low_score_churn = df[df['satisfaction_score'] < 3]['churn_value'].value_counts(normalize=True)
@@ -212,7 +220,7 @@ def check_satisfaction_score(df):
 
 def transform_skewed_features(df):
     """Apply log transformation to heavily skewed numerical features"""
-    logger.info("\nTransforming skewed features...")
+    logger.info("Transforming skewed features...")
     
     # Apply log transform to right-skewed features
     for col in ['total_long_distance_charges', 'total_revenue']:
@@ -231,7 +239,7 @@ def plot_feature_distributions(df, target_col='churn_value', cat_cutoff=10):
     
     Features with cardinality less than cat_cutoff are considered categorical
     """
-    logger.info("\nPlotting feature distributions...")
+    logger.info("Plotting feature distributions...")
 
     # Target distribution
     fig_target, ax = plt.subplots(figsize=(6, 6))
@@ -267,7 +275,7 @@ def plot_feature_distributions(df, target_col='churn_value', cat_cutoff=10):
         cat_order = sorted(df[col].unique())
         
         # Distribution of col
-        sns.countplot(data=df, x=col, ax=axes[i, 0], hue=col, legend=False, palette='Dark2', order=cat_order)
+        sns.countplot(data=df, x=col, ax=axes[i, 0], hue=col, palette='Dark2', order=cat_order)
         axes[i, 0].set_title(f"Distribution of {col}")
         axes[i, 0].set_xlabel('')
         axes[i, 0].set_ylabel('Count')
@@ -283,7 +291,7 @@ def plot_feature_distributions(df, target_col='churn_value', cat_cutoff=10):
         churn_by_cat = df.groupby(col)[target_col].mean() * 100
         churn_by_cat = churn_by_cat.reset_index()
         sns.barplot(data=churn_by_cat, x=col, y=target_col, ax=axes[i, 2], 
-                    hue=col, legend=False,
+                    hue=col,
                     palette='Dark2', order=cat_order)
         axes[i, 2].set_title(f"{target_col} rate by {col}")
         axes[i, 2].set_xlabel('')
@@ -364,14 +372,14 @@ def run_data_cleaning(plot_check=False):
         plot_feature_distributions(df)
     
     # logger.info dataset info
-    logger.info(f"\nFinal shape: {df.shape}")
-    logger.info("\nFeature cardinality:")
+    logger.info(f"Final shape: {df.shape}")
+    logger.info("Feature cardinality:")
     logger.info(cardinality(df))
 
     # Save cleaned dataset
     output_path = PROCESSED_DATA_DIR / 'telco_cleaned.csv'
     df.to_csv(output_path)
-    logger.info(f"\nCleaned dataset saved to {output_path}")
+    logger.info(f"Cleaned dataset saved to {output_path}")
     return True
 
 def main():
@@ -380,6 +388,6 @@ def main():
 if __name__ == "__main__":
     success = main()
     if not success:
-        logger.warning("\nData cleaning script completed with errors. Review output and check notebooks.")
+        logger.warning("Data cleaning script completed with errors. Review output and check notebooks.")
     else:
-        logger.info("\nData cleaning script completed successfully.")
+        logger.info("Data cleaning script completed successfully.")
