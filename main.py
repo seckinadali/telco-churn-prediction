@@ -15,6 +15,7 @@ import logging
 
 from src.data_merging import run_data_merging
 from src.data_cleaning import run_data_cleaning
+from src.model_development import run_model_development
 
 # Logger configuration
 import logger
@@ -23,7 +24,7 @@ import logger
 logger = logging.getLogger(__name__)
 
 # Global configuration
-PLOT_CHECK = True  # Set to True if you want to generate plots
+PLOT_CHECK = True
 
 def main():
     """
@@ -32,7 +33,7 @@ def main():
     logger.info("Starting Telco Churn Prediction pipeline...")
     
     # Step 1: Data Merging
-    logger.info("\n=== STEP 1: DATA MERGING ===")
+    logger.info("=== STEP 1: DATA MERGING ===")
     data_merging_success = run_data_merging()
     
     if not data_merging_success:
@@ -40,16 +41,24 @@ def main():
         return False
     
     # Step 2: Data Cleaning and EDA
-    logger.info("\n=== STEP 2: DATA CLEANING AND EDA ===")
+    logger.info("=== STEP 2: DATA CLEANING AND EDA ===")
     data_cleaning_success = run_data_cleaning(plot_check=PLOT_CHECK)
     
     if not data_cleaning_success:
         logger.error("Data cleaning failed. Stopping the pipeline.")
         return False
     
-    # TODO: Remaining steps
+    # Step 3: Model Development
+    logger.info("=== STEP 3: MODEL DEVELOPMENT ===")
+    model_development_success = run_model_development(plot_check=PLOT_CHECK)
     
-    logger.info("\nTelco Churn Prediction pipeline completed successfully!")
+    if not model_development_success:
+        logger.error("Model development failed. Stopping the pipeline.")
+        return False
+    
+    # TODO: Step 4: Feature Importance
+    
+    logger.info("Telco Churn Prediction pipeline completed successfully!")
     return True
 
 if __name__ == "__main__":
