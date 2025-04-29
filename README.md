@@ -76,6 +76,8 @@ We developed multiple models optimized for different business objectives:
 | XGBoost (High Precision) | 0.55 | 0.84 | 0.40 | 0.82 | Minimize false alarms |
 | Linear SVC | 0.66 | 0.68 | 0.64 | 0.82 | Simple, interpretable model |
 
+*Note: Our F1-optimized model happened to produce nearly identical precision and recall values on our dataset, though generally F1 optimization doesn't guarantee equal metrics.*
+
 ### Implementation Note
 
 The metrics above reflect our current production code results. When comparing with the notebook exploration, we see minor differences: XGBoost metrics differ by at most 1.2 percentage points, while the Linear SVC model shows almost identical results (differences of less than 0.004 percentage points).
