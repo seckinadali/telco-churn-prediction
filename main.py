@@ -2,11 +2,9 @@
 Run the complete pipeline for the telco churn prediction project.
 
 This script orchestrates the entire pipeline by running the following scripts in sequence:
-- data_merging.py,
-- data_cleaning.py,
-- model_development.py,
-- threshold_adjustment.py,
-- test_evaluation.py,
+- data_merging.py
+- data_cleaning.py
+- model_development.py
 - feature_imortance.py
 """
 
@@ -16,6 +14,7 @@ import logging
 from src.data_merging import run_data_merging
 from src.data_cleaning import run_data_cleaning
 from src.model_development import run_model_development
+from src.feature_importance import run_feature_importance
 
 # Logger configuration
 import logger
@@ -25,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 # Global configuration
 PLOT_CHECK = True
+SHAP_CHECK = True
 
 def main():
     """
@@ -56,7 +56,13 @@ def main():
         logger.error("Model development failed. Stopping the pipeline.")
         return False
     
-    # TODO: Step 4: Feature Importance
+    # Step 4: Feature Importance
+    logger.info("=== STEP 4: FEATURE IMPORTANCE ===")
+    feature_importance_success = run_feature_importance(plot_check=PLOT_CHECK, shap_check=SHAP_CHECK)
+    
+    if not feature_importance_success:
+        logger.error("Feature importance failed. Stopping the pipeline.")
+        return False
     
     logger.info("Telco Churn Prediction pipeline completed successfully!")
     return True
