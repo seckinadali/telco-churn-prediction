@@ -11,8 +11,14 @@ The script follows these steps:
 4. Compare merged result with pre-consolidated datasets for validation
 """
 
+import sys
 import logging
 from pathlib import Path
+
+# Add project root to Python path to allow importing logger
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
 import pandas as pd
 
 # Logger configuration
@@ -22,8 +28,6 @@ import logger
 logger = logging.getLogger(__name__)
 
 # Set paths
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 

@@ -12,8 +12,14 @@ The script follows these steps:
 6. Check for and handle data leakage
 """
 
-from pathlib import Path
+import sys
 import logging
+from pathlib import Path
+
+# Add project root to Python path to allow importing logger
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -31,8 +37,6 @@ import logger
 logger = logging.getLogger(__name__)
 
 # Set paths
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
 PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 FIGURES_DIR = PROJECT_ROOT / "figures"
 
